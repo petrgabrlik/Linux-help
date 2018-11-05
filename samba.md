@@ -29,6 +29,6 @@ Connect using Finder:
 2. cmd-k or Open->Connect to server
 3. write (and save) address, eg `smb://192.168.0.1/user`
 
-## Windows
+### Windows
 
 ## Configuration
