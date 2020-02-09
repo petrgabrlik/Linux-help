@@ -188,4 +188,7 @@ date
 ------
 - zobrazeni a nastaveni casu
 - bohate moznosti formatovani\
-`date +%Y`
+`date +%Y` vypis pouze rok
+`date +%A/%I/%Y/%Z` vice parametru najednou
+`date +%u` UTC cas
+`date -d "tomorrow" +%Y` zobrazeni data z retezce spolu s formatovanim
