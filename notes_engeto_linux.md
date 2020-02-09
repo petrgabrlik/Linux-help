@@ -187,4 +187,5 @@ du vs df ????
 date
 ------
 - zobrazeni a nastaveni casu
-
+- bohate moznosti formatovani\
+`date +%Y`
