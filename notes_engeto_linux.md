@@ -104,20 +104,22 @@ diff -u fruits.txt fruits-sorted.txt	prehlednejsi vystup
 Lekce 3
 =======================================================
 
+
 tar
 ---------
-- tape archive, zabaleni dat do jednoho souboru, primarne bez komprese, pokud neni pouzit option pro kompresi
-- uchovava puvodni soubor
-- vzdy je potreba nejaky prepinac
-\\ `tar [OPTION...] [FILE]...`
-\\ `tar -cf archive.tar file1 file2`
-\\ `-c`	create, vyrobi balik
-\\ `-f`	filename	
-\\ `-v` verbose, ukecany
-\\ 'tar -tvf archive.tar` vypise obsah archivu (t) podrobne (v)
-\\ `-x` extrahuje, rozbali balik
+
+- tape archive, zabaleni dat do jednoho souboru, primarne bez komprese, pokud neni pouzit option pro kompresi  
+- uchovava puvodni soubor  
+- vzdy je potreba nejaky prepinac  
+`tar [OPTION...] [FILE]...`  
+`tar -cf archive.tar file1 file2`  
+`-c` create, vyrobi balik  
+`-f` filename	
+`-v` verbose, ukecany  
+'tar -tvf archive.tar` vypise obsah archivu (t) podrobne (v)  
+`-x` extrahuje, rozbali balik  
 - tar zaroven komprimuje: `-z` gzip, `-j` bzip2, `-J` xz
-\\ `tar -czvf archive.tar.gz file1 file2` komprimace gzip s verbose vypisem
+`tar -czvf archive.tar.gz file1 file2` komprimace gzip s verbose vypisem
 
 zip, unzip
 ---------
@@ -130,8 +132,10 @@ zip, unzip
 \\ `unzip archive.zip`		rozbali	
 \\ `unzip archive.zip -d FOLDER`	rozbaleni do adresare
 
+
 gzip, gunzip
 ----------
+
 - gzip je na linuxu castejsi nez zip
 - gzip NEARCHIVUJE, pracuje s jednotlivymi soubory, proto se casto pouziva s archivem tar
 - gzip NEZACHOVAVA originalni soubory, vytvori .gz soubor
