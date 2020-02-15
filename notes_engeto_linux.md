@@ -18,7 +18,10 @@
 /var - logy, konfigurace ktere nejsou staticke (jinak etc), /var/log systemove logy, /messages, /wwww content weboveho serveru
 
 
-
+cat
+-----
+- concatination, tedy zretezeni. Vypise za sebe obsah souboru
+- casteji se pouzivat jako rychly vypis jednoho souboru a pipe `cat file.txt | grep xxx`
 
 cd ~student // prejde do home konkretniho uzivatele
 
@@ -107,41 +110,39 @@ Lekce 3
 
 tar
 ---------
-
 - tape archive, zabaleni dat do jednoho souboru, primarne bez komprese, pokud neni pouzit option pro kompresi  
 - uchovava puvodni soubor  
 - vzdy je potreba nejaky prepinac  
-`tar [OPTION...] [FILE]...`  
-`tar -cf archive.tar file1 file2`  
-`-c` create, vyrobi balik  
-`-f` filename	
-`-v` verbose, ukecany  
-'tar -tvf archive.tar` vypise obsah archivu (t) podrobne (v)  
-`-x` extrahuje, rozbali balik  
+- `tar [OPTION...] [FILE]...`  
+- `tar -cf archive.tar file1 file2` archivace souboru
+- `-c` create, vyrobi balik  
+- `-f` filename	
+- `-v` verbose, ukecany  
+- `tar -tvf archive.tar` vypise obsah archivu (t) podrobne (v)  
+- `-x` extrahuje, rozbali balik  
 - tar zaroven komprimuje: `-z` gzip, `-j` bzip2, `-J` xz
-`tar -czvf archive.tar.gz file1 file2` komprimace gzip s verbose vypisem
+- `tar -xvf file` extrahuje, pripadne i rozbali, pokud obsahuje kompresi
+- `tar -czvf archive.tar.gz file1 file2` komprimace gzip s verbose vypisem
 
 zip, unzip
 ---------
 - zabali a kompresuje, umoznuje pridavat
-\\ `zip archive.zip file1 file2`	vytvori archiv
-\\ `zip archive.zip file3 file4`	prida do archivu
-\\ `-r` pridani slozky i s obsahem
-\\ `-d` smazani soboru z archivu
-\\ `unzip -l archive.zip`	vypise zabalena data
-\\ `unzip archive.zip`		rozbali	
-\\ `unzip archive.zip -d FOLDER`	rozbaleni do adresare
-
+- `zip archive.zip file1 file2`	vytvori archiv
+- `zip archive.zip file3 file4`	prida do archivu
+- `-r` pridani slozky i s obsahem
+- `-d` smazani soboru z archivu
+- `-e` encrypt, zahesluje, heslo se zada do konzole
+- `unzip -l archive.zip` vypise zabalena data
+- `unzip archive.zip` rozbali	
+- `unzip archive.zip -d FOLDER`	rozbaleni do adresare
 
 gzip, gunzip
 ----------
-
 - gzip je na linuxu castejsi nez zip
 - gzip NEARCHIVUJE, pracuje s jednotlivymi soubory, proto se casto pouziva s archivem tar
 - gzip NEZACHOVAVA originalni soubory, vytvori .gz soubor
-// `gzip file` -> `file.gz`
-// `gunzip file.gz` -> `file`
-
+- `gzip file` -> `file.gz`
+- `gunzip file.gz` -> `file`
 
 vi, vim
 --------
@@ -167,57 +168,79 @@ vi, vim
 presmerovani vystupu STDOUT STDERR
 ---------------------
 - operatory > >> 2> 2>>\
-`cmd > file`	vystup zapise do soboru, prepise ho, stejne jako 1>
-cmd >> file	prida na konec souboru, append, 1>>
-cmd 2> file	presmerovani erroru
-cmd 2>> file	append erroru
+- `cmd > file`	vystup zapise do soboru, prepise ho, stejne jako 1>
+- `cmd >> file`	prida na konec souboru, append, 1>>
+- `cmd 2> file`	presmerovani erroru
+- `cmd 2>> file` append erroru
 - primarni stdout a stderr ma defaulne vystup do terminalu
 - stdin 0, stdout 1, stderr 2
 - cat file1 file2 > fileout 2> fileerr		out do jednoho souboru, error do druheho
 - cat file1 file2 > file 2>&1			out i err do jednoho souboru file 
-- presmerovani ma prednost pred vsim, okamzite dojde k prepsani a smazani souboru, radeji pouzivat >>
+- presmerovani ma prednost pred vsim, okamzite dojde k prepsani a smazani souboru, radeji pouzivat >> (append)
 
 presmerovani vstupu STDIN
 ------
-- operatory < << <<<
-cat | tr [:lower:] [:upper:] >> file
-cat << EOF >> file	prijima na vstup dokud neni na vstupu EOF a uklada do souboru
-cat < filex	je to same jako		cat filex | cat		posli na vstup 
-bc <<< cmd	nejprve vyhodnoti cmd a posle na vstup bc
+- do programu muzu posilat vstup PRIMO uzivatelsky, napr `cat > log.txt`, tedy program cat je bez argumentu a interaktivne zachytava uzivatelsky vstup a uklada do souboru dokud neni ukonce `ctrl+d`.  
+- cat | tr [:lower:] [:upper:] >> file
+- vstup muzu posilat NEPRIMO pomoci operatoru: `<` vstup ze souboru, `<<` zarazka, ` <<<` predem napsany string
+- `<` posle soubor na vstup programu
+- `cat FILE` a `cat < FILE` dela to same, zasila soubor na vsup programu (v prvnim pripade argument?), pripadne `cat FILE | cat`
+- `tr` napr neumi prijmout soubor jako argument, musi se zaslat na vstup bud jako `cat FILE | tr a b` nebo `tr a b < FILE`
+- `<<` zarazka definuje jak bude vypadat ukoncovaci string
+- cat << EOF >> file	prijima na vstup dokud neni na vstupu EOF a uklada do souboru
+- `<<<` posila na vstup string
+- `cat <<< ahoj` vypise `ahoj`
+- `cat <<< text` dela to same jako `echo text`
 
 locate
 -------
 - hledani souboru v celem systemu, extra rychly
-- je treba aktualizovat databazi updatedb
+- je treba aktualizovat databazi `updatedb`, jinak neukazuje aktualni vysledky
 - v /etc/updatedb.conf je konfigurace, napr vyjimky kde nehledat
 
 find
 -------
-- hledani soboru v danem adresari, siroka parametrizovatelnost, napr podle data
-- nemusi byt stejny na vsech systemech, napr na linuxu a macos
-find . -name patern	hledej patern v aktualnim adresari
+- hledani soboru v danem adresari (podadresarich), siroka parametrizovatelnost, napr podle data
+- nemusi byt stejny na vsech systemech, napr na linuxu a macos se muze chovat jinak
+- pomalejsi nez locate, nema predvytvorenou databazi
+- pouziva se pri skriptovani
+- `find PATH OPTIONS` adresar piseme PRED prepinac 
+- `find .` vypise vsecny soubory, neni specifikovany patern
+- `find . -name patern`	hledej patern v aktualnim adresari
+- `find Documents/ -maxdepth 1`
+- `-name` hledani paternu, `-iname` case insensitive
+- `-maxdepth` `-mindepth` min a max uroven prohledavani
+- `-type d` `-type f` hleda jen slozky/soubory
+- `find . -maxdepth 1  -name "file*"` zastupne znaky `*` a `?` do ovozovek nebo `\*`
+- `find ~ -iname \*athletes\*` vrati celou absolutni cestu, `find . -iname \*athletes\*` vrati relativni cestu
+
+file
+-----
+- informace o souboru 
+- `file soubor.txt`
+- `file *`
 
 du
 ------
 - velikost souboru, kolik zabira na disku
 - minimalni alokovatelna velikost na disku je 4K, napr
-du -ak	vsechny soubory v adresari (a zanorenych) v kB
-du -ah	variabilni jednotka velikosti
+- `du -h` velikost vsech adresaru, human readable
+- `du -ak` vsechny soubory v adresari (a zanorenych) v kB
+- `du Documents/ -sh` suma za cely adresar
 
 df
 -------
-- disk free
-df -h	human readable
-du vs df ????
+- file system disk usage, prehled volneho mista v pameti 
+- `df -hT` human readable, typ souborovych systemu
 
 date
 ------
 - zobrazeni a nastaveni casu
 - bohate moznosti formatovani\
-`date +%Y` vypis pouze rok\
-`date +%A/%I/%Y/%Z` vice parametru najednou\
-`date +%u` UTC cas\
-`date -d "tomorrow" +%Y` zobrazeni data z retezce spolu s formatovanim\
+- `date +%Y` vypis pouze rok\
+- `date +%A/%I/%Y/%Z` vice parametru najednou\
+- `date +%u` UTC cas\
+- `date -d "tomorrow" +%Y` zobrazeni data z retezce spolu s formatovanim\
 
 
 Lekce 4
@@ -237,7 +260,7 @@ id
 who
 -------
 - vypis pripojenych uzivatelu
-\\ `whoami` aktualni user
+- `whoami` aktualni user
 
 users
 -------
