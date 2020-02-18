@@ -96,6 +96,11 @@ git remote add <shortname> <url>
 git remote add pb https://github.com/username/repo
 ```
 
+Change remote URL
+```
+git remote set-url origin <url>
+```
+
 ## Pushing
 
 Push to remote server
