@@ -167,27 +167,27 @@ vi, vim
 
 presmerovani vystupu STDOUT STDERR
 ---------------------
-- operatory > >> 2> 2>>\
+- operatory `> >> 2> 2>>`
 - `cmd > file`	vystup zapise do soboru, prepise ho, stejne jako 1>
 - `cmd >> file`	prida na konec souboru, append, 1>>
 - `cmd 2> file`	presmerovani erroru
 - `cmd 2>> file` append erroru
 - primarni stdout a stderr ma defaulne vystup do terminalu
 - stdin 0, stdout 1, stderr 2
-- cat file1 file2 > fileout 2> fileerr		out do jednoho souboru, error do druheho
-- cat file1 file2 > file 2>&1			out i err do jednoho souboru file 
+- `cat file1 file2 > fileout 2> fileerr`		out do jednoho souboru, error do druheho
+- `cat file1 file2 > file 2>&1`			out i err do jednoho souboru file 
 - presmerovani ma prednost pred vsim, okamzite dojde k prepsani a smazani souboru, radeji pouzivat >> (append)
 
 presmerovani vstupu STDIN
 ------
 - do programu muzu posilat vstup PRIMO uzivatelsky, napr `cat > log.txt`, tedy program cat je bez argumentu a interaktivne zachytava uzivatelsky vstup a uklada do souboru dokud neni ukonce `ctrl+d`.  
-- cat | tr [:lower:] [:upper:] >> file
+- `cat | tr [:lower:] [:upper:] >> file`
 - vstup muzu posilat NEPRIMO pomoci operatoru: `<` vstup ze souboru, `<<` zarazka, ` <<<` predem napsany string
 - `<` posle soubor na vstup programu
 - `cat FILE` a `cat < FILE` dela to same, zasila soubor na vsup programu (v prvnim pripade argument?), pripadne `cat FILE | cat`
 - `tr` napr neumi prijmout soubor jako argument, musi se zaslat na vstup bud jako `cat FILE | tr a b` nebo `tr a b < FILE`
 - `<<` zarazka definuje jak bude vypadat ukoncovaci string
-- cat << EOF >> file	prijima na vstup dokud neni na vstupu EOF a uklada do souboru
+- `cat << EOF >> file`	prijima na vstup dokud neni na vstupu EOF a uklada do souboru
 - `<<<` posila na vstup string
 - `cat <<< ahoj` vypise `ahoj`
 - `cat <<< text` dela to same jako `echo text`
@@ -246,37 +246,57 @@ date
 Lekce 4
 =======================================================
 
-users
+uzivatele, users
 ------
-- opravdovi vs functional users
+- opravdovi (nesystemovi) vs functional (systemovi) users
 - seznam useru v `/etc/passwd`
 - nazev uzivatele : kdysi heslo : user id : group id : komentar : domovsky adr : shell
 - root ma id vzdy 0, 0-1000 functional users, 1000+ fyzicti uzivatele (neni to ale pravidlo)
+- vsichni uzivatele krome root jsou v terminalu oznaceni `$`
+- root (superuser) ma id 0, ma maximalni pravomoci, v terminalu oznacen `#`
+
+skupin, groups
+------
+- skupiny definuji permissions pro uzivatele, kteri jsou jejimi cleny
+- uzivatel muze byt clenem vice skupin
+- informace o skupinach najdeme v `/etc/group`
 
 id
 -------
-- vypise informace o aktualnim uzivateli
+- vypise informace o uzivateli, bez argumentu aktualnim 
 
 who
 -------
-- vypis pripojenych uzivatelu
+- vypis PRAVE PRIPOJENYCH uzivatelu
 - `whoami` aktualni user
 
 users
 -------
-- seznam pripojenych uzivatelu
+- jednoduchy seznam PRIPOJENYCH uzivatelu
+
+w
+-----
+- rozsireny seznam PRIPOJENYCH uzivatelu 
 
 superuser, root, admin ..
 ------------------------
-\\ `su` prepnuti na jineho usera, bez parametru na root, je pozadovano heslo ciloveho uzivatele
-\\ `sudo` vykonej prikaz jmenem root, eskalace prikazu. Uzivatel musi mit pravo pouzivat sudo. Pri sudo uzivatel pouziva sve heslo. 
+- `su` prepnuti uzivatele-substitute, eskalace prav jineho usera, bez parametru na root, je pozadovano heslo ciloveho uzivatele. Prepnuty uzivatel se spusti v novem shellu (subshellu), prepnuti zpet pomoci `exit`
+- `su -c 'prikaz1 prikaz2 ...'`, `su uzivatel -c 'prikaz prikaz'` provedeni prikazu pod root/uzivatelem
+- `sudo` (super user do) vykonej prikaz jmenem root, eskalace prav. Uzivatel musi mit pravo pouzivat sudo. Pri sudo uzivatel pouziva sve heslo. 
 - sudo muze byt povoleno jen na nektere binarky, je to definovano v `/etc/sudoers` 
 - `/etc/sudoers` se edituje pomoci `visudo`, kontroluje spravnost
 - `sudo su` prepnuti na root bez znalosti root hesla, prikaz musi byt ale povoleny
+- `sudo` na jednotlive prikazy, neni potreba zadavat heslo pokazde, `su` na vetsi praci, vzdy heslo pri prepinani
+
+sudoers
+-----
+- definice prav superusera s omezenym pristupem (sudo)
+- `user ALL=(ALL) ALL` a `%group ALL=(ALL) ALL`: prvni ALL je vzadlene zarizeni (host) pro ktere plati podminky (pro pripad distribuovaneho suders, druhy (ALL) je specifikace uzivatelu kterym zvysujeme prava, treti ALL oznacuje povolene prikazy 
+- `ALL ALL=(ALL) ALL` a `ALL ALL=(ALL) NOPASSWD: ALL` umoznuje komukoliv prihlasenemu spustit cokoliv pres sudo, v druhem pripade i bez hesla
 
 hesla v linuxu
 -------------
-- `/etc/shadow` seznam hesel, uzivatelsky zadana hesla jsou ulozena jako hash, pristup ma jen root
+- `/etc/shadow` seznam hesel, uzivatelsky zadana hesla jsou ulozena jako hash, pristup ma jen root. Struktura: user : hash hesla : posledni zmena dny od 1.1.1970 : mid dnu mezi zmenami : max dnu platnost hesla : pocet dni pred upozornenim na platnost : neaktivita dny po vyprseni
 - uzivatelska hesla (u roota ne) musi splnovat dictionary check
 
 passwd
@@ -295,7 +315,7 @@ user management
 
 group management
 ------------
-\\ `/etc/group` seznam group; nazev : heslo? : groupid : seznam uzivatelu
+\\ `/etc/group` seznam group; nazev : heslo? : groupid : seznam uzivatelu odelen carkami
 - soubor muzu editovat, pripsat uzivatele do groupy
 \\ `groupadd GROUP` pridani prazdne groupy
 \\ `groupmod`
