@@ -1,3 +1,18 @@
+Lekce 1
+============
+
+historie bash
+-----------
+- `history` vypise cislovanou historii prikazu
+- `ctrl+r` hledani v historii od konce, `ctrl+r` pro skok na dalsi shodu
+- `!!` spusti posledni prikaz, muzu ho doplnit napr `sudo !!`
+- `!34` spusti 34. prikaz hisotrie, bez moznosti modifikace
+- `fc 34` otevre 34. prikaz historie v textovem editoru, po uprave a ulozeni se vykona
+
+
+Lekce 2
+=============
+
 /bin - vsechny binarky prikazum, primarni nastroje
 /sbin - podobne jako bin, ale ne primarni prikazy, spis zalohy, dodatecny sw a nastroje, primo nespustitelne
 /boot - soubory spoustene po startu systemu
@@ -221,12 +236,14 @@ file
 - `file *`
 
 du
-------
-- velikost souboru, kolik zabira na disku
-- minimalni alokovatelna velikost na disku je 4K, napr
+-----
+- disk usage, velikost souboru, kolik zabira na disku (kolik zabira bloku)
+- minimalni alokovatelna velikost na disku je napr 4K, velikost bloku napr 1K
 - `du -h` velikost vsech adresaru, human readable
 - `du -ak` vsechny soubory v adresari (a zanorenych) v kB
-- `du Documents/ -sh` suma za cely adresar
+- `du Documents/ -h` suma za cely adresar
+- `du Documents/ -ah` velikost souboru uvnitr adresare
+- `ls -lh` zobrazuje realnou velikost souboru, napr 24B, `du` ukaze 4 (bloky), `du -h` pak 4kB, protoze blok ma 1kB a min alokovatelna velikost pro soubor je 4kB
 
 df
 -------
@@ -302,57 +319,268 @@ hesla v linuxu
 passwd
 --------
 - zmena hesla, bez parametru aktualniho usera
-\\ `passwd user1` zmena hesla pro konkretniho usera, nutno znat jeho heslo
+- `passwd user1` zmena hesla pro konkretniho usera, nutno znat jeho heslo
 
 user management
 --------------
-\\ `useradd USER` vytvoreni usera, vytvaret muze jen root (pripadne sudo) 
+- `useradd USER` vytvoreni usera, vytvaret muze jen root (pripadne sudo) 
 - novy user obdrzi ke vsemu defaultni hodnoty
-\\ `usermod [options] LOGIN` zmena nastaveni usera
-\\ `usermod -u -G` user id, group 
-\\ `userdel USER` defaultne smaze uzivatele, zaznamy apod, ale zachova email a home adresar
-\\ `userdel -r USER` smaze vsechno, u home
+- `sudo useradd -u 111 -g 999 -d /home/other_user -c "Doplnkovy text" other_new_user` ruzne prepinace
+- `usermod [options] USER` zmena nastaveni usera, stejne prepinace jako u `useradd`
+- `usermod -G group1,group2 user` pridani uzivatele do skupiny/skupin
+- `userdel USER` defaultne smaze uzivatele, zaznamy apod, ale zachova email a home adresar
+- `userdel -r USER` smaze vsechno, i home
+- `passwd USER` zmena hesla uzivatele, nastaveni hesla pro noveho
 
 group management
 ------------
-\\ `/etc/group` seznam group; nazev : heslo? : groupid : seznam uzivatelu odelen carkami
+- `/etc/group` seznam group; nazev : heslo? : groupid : seznam uzivatelu odelen carkami
 - soubor muzu editovat, pripsat uzivatele do groupy
-\\ `groupadd GROUP` pridani prazdne groupy
-\\ `groupmod`
-\\ `groupdel`
+- `groupadd GROUP` pridani prazdne groupy
+- `groupmod` pro zmenu skupiny, napr `groupmod -n new_name name` pro prejmenovani
+- `groupdel`
+- `groups USER` vypise skupiny uzivatele
 
 vlastnictvi
 ------------
-\\ `ls -l` prvni sloupec vlastnicvi usera, druhy vlastnictvi group
-\\ `chown USER FILE` zmena vlastnictvi souboru
-\\ `chgrp` zmena groupy u souboru
-\\ `chown USER:GROUP FILE` muzu zmenit jen usera, nebo jen group, nebo oboje
+- `ls -l` prvni sloupec vlastnicvi usera, druhy vlastnictvi group
+- `chown USER FILE` zmena vlastnictvi souboru
+- `chgrp USER FILE` zmena vlastnictvi skupiny u souboru
+- `chown USER:GROUP FILE` muzu zmenit jen usera, nebo jen group, nebo oboje
 
 permission
 ------
 - pristupova prava k souborum
 - rwx|rwx|rwx - jake maji prava user|group|ostatni
 - u adresare x znamena moznot vlezt do adresare (stat se validni adresou)
-\\ `chmod` zmena prav, dva typy zapisu, symbolicky a numericky
-- symbolicy: napr. u+x (ugoa)(+-=)(rwx), = je presne tyto parametry
+- `chmod` zmena prav, dva typy zapisu, symbolicky a numericky
+- symbolicy: napr. u+x (ugoa)(+-=)(rwx), = znamena presne tyto parametry
 - numericka: r-4 w-3 x-1, napr. `chmod 755 FILE`, pri 000 muze jenom root
 - specielni permissions, `chmod +s`
 - sticky bit - aby mohl mit nejakou funkci, musi byt soubor executable, pokud je `S` tak neplatne, musi byt `s`
-- sticky bit na userovi - proces pobezi pod tim userem, kdo je owner, priklad `/bin/chmod` je pokazde spusten pod rootem
-- sticky bit na group - kdokoliv zavola, ma prava dane skupiny??
-- sticky bit na adresari - znaceny `t`, ma treba `/tmp`, i kdyz mam vsechny prava 777, muzu modifikovat/mazat jen sve souboru, neboli Ber ohled na vlastnictvi souboru
+- SUID - `s`, proces pobezi pod tim userem, kdo je owner, priklad `/bin/chmod` je pokazde spusten pod rootem, stejne tak pri zmene hesla pomoci `/usr/bin/passwd` je diky suid vzdycky provedeno jako root a muze tak modifikovat soubor s hesly `/etc/shadow` vlastneny rootem
+- SGID - `s`, soubor bude spusten jako by jej spustila skupina ktera jej vlastni
+- sticky bit na adresari - `t`, ma treba `/tmp`, i kdyz mam vsechny prava 777, muzu modifikovat/mazat jen sve souboru, neboli Ber ohled na vlastnictvi souboru
+- SUID, SGID a sticky se nastavuji v numericke notaci na zacatku, napr `4xxx`, 4-SUID, 2-GUID, 1-sticky; symbolicky `u+s`, `g+s`, `+t`
 
 umask
 ------
 - defaultni permissions pro nove soubory, dane cislo se odecita od 0777 v pripade adresaru, 0666 u souboru (soubor po vytvoreni neni nikdy executable)
-\\ `umask 0266` nove soubory budou -r--------
-- kazdy user muze mit sve umask
+- `umask 0266` nove soubory budou -r--------
+- kazdy user muze mit sve umask, umask se musi pridat do .bashrc pro trvalou zmenu
 
 acccess control list ACL
 ---------------------------
-- dodatecna modifikace prav 
-\\ `getfacl -m` upravi prava pro soubor pro konkretniho usera
+- dodatecna modifikace prav, vhodne spise pro nestandardni/okrajove pripady 
+- `getfacl FILE` vypise ACL
+- `setfacl -m <ug>:<USERNAME>:<rwx> <FILE>` upravi prava pro soubor pro konkretniho usera/skupinu
+- `setfacl -x u:student /etc/services` odstranit konkretni ACL
+- `setfacl -b /etc/services` zrusit vsechny ACL
 - ve vypisu (ls -l) se zobrazuje jako + na konci prav
-\\ `getfacl FILE` vypise ACL
 
 
+
+Lekce 5
+==================================
+
+procesy
+-------
+- proces jako jedna z mala veci v linuxu neni soubor, proces je bezici instance programu, program je tedy v operacni pameti
+- `ps` list bezicich procesu prihlaseneho uzivatele
+- `ps -ef` podrobny vypis vsech procesu, vcetne PPID
+- `po --forest` graficke znazorneni vazby rodic potomek
+- `ps -aux` vsechny bezici procesy, vyuziti procesoru, ram
+- `ps f` vetve procesu
+- `PID` unikantni cislo procesu, nejnizsi 1, `PPID` parent proces id
+- `echo $$` vypise PID aktualniho shellu
+- `top` dynamicky vypis procesu
+- `top -b -d 5` batch mode, postupny vypis do terminalu, perioda 5s
+- `top -b | grep loop0` sleduje jeden proces
+- `htop` graficky dynamicky vypis procesu
+- `pstree` strom procesu
+
+adresar /proc
+-----------
+- vyse uvedene prikazy zjistuji informace z /proc, kde jsou procesy ulozeny jako soubory
+- `/proc` kazdy ciselny adresar patri danemu procesu, kratkodobe ulozeni dat procesu
+- adresar je virtualni souborovy system, soubory nejsou skutecne, nejsou ulozeny na disku, pri kazdem `ls` musi seznam system vygenerovat znova 
+- `/proc/PID/fd` ls -l file descriptory, odkud kam tecou data, ukazuje jednotlive streamy kam se ukladaji 
+- `cat /proc/cpuinfo` `cat /proc/cpuinfo | grep "model name"` info o procesoru
+- `cat /proc/meminfo` informace o vyuziti pameti
+
+signaly
+-------
+- signaly mezi user space a kernel space, prcesy posilaji signaly i mezi sebou
+- `man 7 signal` manual k linuxovym standard (POSIX) signalum, taky `kill -l` 
+- 1 `SIGHUP` hang up signal indikujici ukonceni pri odpojeni 
+- 2 `SIGINT` interupt proces ctrl+c
+- 9 `SIGKILL` nasilne ukonceni procesu
+- 11 `SIGSEGV` posle kernel pokud chceme sahnout na zabranou pamet, odkaz na neplatnou pamet
+- 15 `SIGTERM` slusne ukonceni procesu
+- 18 `SIGCONT` spusti zastaveny proces
+- 19 `SIGSTOP` zastaveni prikazem
+- 20 `SIGSTOP` zastaveni klavesovou zkratkou `ctrl+z`
+
+kill
+-------
+- `sleep 1000&` uspani na 1000s, vznikne novy proces (na testovani), `&` spusti proces na pozadi
+- `kill` bez specifikace signalu znamena `SIGTERM`
+- `kill -<SIG> PID` pro specifikaci procesu, `kill -<SIG> %JOBID` pro specifikaci jobu
+- `kill -15 PID` posle signal termination danemu procesu 
+- `kill -0 PID` odesle prazdny signal, pro kontrolu existence procesu
+- `killall` ukoncuje procesy podle jmena, vsechny s danym jmenem
+- `killall -u user proces` ukonci vsechny procesy se jmenem proces od uzivatele user, parametrizovatelne
+
+subshell
+-------
+- prikaz `bash` spusti novy bash jako subshell, ukonceni `exit` nebo `ctrl+d`. V `ps -ef` vidime ze novy bash ma PPID rovno PID puvodniho shellu - je jeho child
+- program muzu spustit v inline subshell pomoci $(PROGRAM) nebo `PROGRAM`. Rodicem spusteneho programu je subshell, nikoli puvodni shell.
+
+pouziti $() ${}
+-------------
+- `$( prikaz1 | prikaz2 )` spusti skupinu prikazu v subshellu
+- `${ prikaz1 | prikaz2 }` spusti skupinu prikazu v aktualnim shellu
+
+
+priority
+-----------
+- niceness NI, zaporne cislo je zvyseni priority, kladne cislo snizeni priority, defaultne 0
+- priorita PR, celkova priorita procesu, cim nizsi cislo tim vyssi priorita
+- PR=20+NI
+- `nice -n -20 sleep 1000&` nastaveni niceness pro novy process
+- `renice -n 10 PID` zmena niceness beziciho procesu
+
+lsof
+------
+- list open files
+- `lsof` vsechny soubory na kter ukazuje file descriptor, `lsof | grep PID` s jakymi soubory pracuje proces
+- `lsof <FILE>` jake procey pracuji se souborem
+- `lsof -p <PID>` s jakymi soubory proces pracuje
+
+process status
+-------------
+- `ps -aux` sloupec STAT
+- zombie proces - proces ktery se ukoncil ale parent to nepotvrdil, zustane viset v procesech, nejde killnout
+
+vytizeni zdroju, informace o systemu a hw
+-------------
+- `cat /etc/os-release` verze systemu
+- `w`
+- `uptime`
+- `free` vyuziti pameni, `free -h` human readable
+- `cat /proc/meminfo`
+
+jobs
+----
+- job je process spusteny aktualnim shellem, ma svoje ID
+- nekdy se tak nazyva nekolik procesu vykonavajici jistou ulohu
+- `jobs` vypise ulohy/joby, `+` znamena posledni spustena, `-` predposledni, prvni sloupec ID jobu
+- `&` (operator) za prikazem zpusobi, ze se prikaz spusti na pozadi
+- `bg` spusti obnovi beh pozastaveneho jobu, spusti jej na pozadi aby neblokoval konzoli
+- `bg` bez parametru spusti posledni job, `bg %1`/`bg 1` spusti job ID 1
+- `fg` presunuti a spusteni jobu v popredi
+- proces do pozadi si spustim tehdy, kdyz nechci aby blokoval konzoli (napr dlouha instalace). Pomoci `jobs` zjistim bezici procesy a pomoci `fg` ho muzu opet vyvolat do popredi. Nasledne jej pomoci `ctrl+z` pozastavim a pomoci `bg` presunu na pozadi a muzu opet pracovat v konzoli.
+
+pgrep pkill
+-----------
+- `pgrep` vypise vsechny procesy s danym jmenem, `pkill` je vsechny i zabije, parametrizovatelne
+- `pgrep bash` procesy s bash v nazvu 
+- `pgrep -u student` procesy studenta
+- vice uzitecnych prepinacu v man
+
+at
+------
+- odlozene vykonani prikazu
+
+crontab
+----------
+- daemon pro odlozene/periodicke spousteni prikazu
+- `/etc/crontab`, edituje se v textovem editoru
+- `crontab` je prikaz ktery s `/etc/crontab` pracuje, `-u` pod konkretnim userem
+
+Lekce 6
+============
+
+package management
+------------
+- high level pkg mngmnt - postara se o sehnani sw, dependencies, vyresi konflikty a zkontroluje cesty, zkontroluje volne misto na disku, rozbali balicek na spravne mista
+- low level pkg mngmnt - pouze instaluje balicek, napr `.rpm`, potrdi uspesnost instalace, neresi dependencies, neumi se konfigurovat v zavislosti na masine,
+- RedHat - balickovaci system RPM, pkg mngmnt HL: yum, dnf; LL: rpm
+- Debian - balickovaci system DEB, pkg mngmnt HL: apt; LL: dpkg
+- `/etc/yum.repos.d/` seznam repozitaru pro yum, kazdy muze obsahovat radu mirroru, ne vsechny musi byt enabled
+
+yum
+-----
+- `yum list available` - dostupne balicky v repozitarich
+- `yum list installed` - nainstalovane balicky
+- `yum list update` - balicky k aktualizaci
+- `yum search pkg`, `yum info pkg` ...
+- `yum update` - update balicku (aktualizace)
+- `yum install pkg`, `yum update pkg`, `yum downgrade pkg`, yum remove|erase pkg` ...
+
+rpm
+-----
+- `rpm -ivh package-1.0-4.x86_64.rpm` - install, verbose, hash progress bar
+- `-U` upgrade, `e` erase
+
+yes
+------
+- `yes <ZNAK>` vypisuje periodicky dany znak, muze se pouzit pro odpoved na prompty
+- napr. `yes y | yum install <PKG>`
+
+devices
+------
+- zarizeni, adr `/dev`, reprezentuji hw, nebo nastroje obsluhujici hw
+- `tty` zarizeni ktere simuluji displej, rozhrani mezi shellem a terminalem
+- `c` na prvnim miste v `ls -l`,  charakter device
+- `b` blok device, napr disk, muzeme primountovat
+- `p` pipe, predavani dat mezi procesy, je to pseudodevice, neni to zarizeni, ve file nic neni, na disku nic neni, je to predani informaci v ramci pameti
+- `l` link
+
+mkfifo
+------
+- vytvoreni pipe, oznaceni `p` v `ls -l`
+- posilani dat z procesu do procesu
+- `mkfifo pipe`, v jednom shellu `echo Hello > pipe`, v druhem shellu `cat pipe`
+
+pseudodevices, pseudozarizeni
+------
+- `full` - zarizeni tvarici se jako plny disk
+- `null` - zapsana data zmizi
+- `random` - pomaly generator velmi nahodnych znaku
+- `urandom` - extremne rychly generator
+- `zero` - generator logickych nul
+
+mountovani
+------------
+- `/etc/fstab` tabulka souborovych systemu, ktere se mountuji pri bootu
+- `fdisk -l` seznam oddilu pripojenych zarizeni
+- `/dev/sd*` fyzicke disky, pismeno znaci disk, cislo oddil, neni zde mozne prohlizet data, je to blok device, nutno nejprve namountovat
+- `mount /dev/sd* /home/USER/DIR` mountovani zarizeni na konkretni misto - mount point
+- `mount -t ntfs /dev/sd* /home/USER/DIR` specifikace souboroveho systemu
+- `umount /home/USER/DIR` odmountovani
+
+dd
+-----
+- vytvori bitovou kopiu
+- pokud na vstupu pouzivam generator, vzdycky definovat blocksize a count
+
+inode
+-----
+- unikatni cislo, muzeme pomoci nej smazat i poskozeny file
+- `ls -li` vypise inody v prvni lekci
+- `df -i` pocet inodu v souborovych systemech
+
+link
+-----
+- hardlink - odkaz na konkretni inode, nemuze byt mezi filesystemy kvuli unikatnosti inodu, hardlinky se tvari jako file
+- symlink - odkazuje na adresu (cestu?), netvari se jako file, ale jako `l`, muzeme linkovat i na jiny filesystem
+
+
+Linux 7
+============
+- `/etc/resolv.conf` dns servery
+- `/etc/hosts` prvni misto kde se dela DNS resolve, ma prednost pred DNS servery v `/etc/recolv.conf`, na Windows je obdony soubor
+- `dig <ADDR>` zjisteni jaka DNS se pouzila, pod polozkou SERVER
+- `netstat -rt` zobraz routing table
+- `netstat -tulpn` otevrene porty
