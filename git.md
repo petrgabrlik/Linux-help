@@ -31,6 +31,16 @@ Clone remote repository into specific directory
 git clone https://github.com/username/repository.git dir-name
 ```
 
+Clone remote repository including submodules
+```
+git clone --recurse-submodules https://github.com/username/repository.git 
+```
+
+Clone as submodule (add submodule)
+```
+git submodule add https://github.com/username/repository.git 
+```
+
 ## Show status
 
 Show files to be commited, and modified and untracked files
@@ -86,9 +96,31 @@ git remote add <shortname> <url>
 git remote add pb https://github.com/username/repo
 ```
 
+Change remote URL
+```
+git remote set-url origin <url>
+```
+
 ## Pushing
 
 Push to remote server
 ```
 git push origin master
+```
+
+## Branches
+
+Show current branch
+```
+git branch
+```
+
+Show all branches
+```
+show branch -a
+```
+
+Switch to a branch (checkout)
+```
+git checkout BRANCHNAME
 ```
