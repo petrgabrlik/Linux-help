@@ -589,3 +589,50 @@ Linux 7
 - `dig <ADDR>` zjisteni jaka DNS se pouzila, pod polozkou SERVER
 - `netstat -rt` zobraz routing table
 - `netstat -tulpn` otevrene porty
+
+Linux 8
+==========
+
+boot process
+------------
+- BIOS na zacatku zkontroluje hw, podle MBR master boot record (prvnich 512B disku) skoci na bootovaci oddil?
+- GRUB - prvni kus sw linuxu, je na disku, spusti kernel, zacne bootovat
+- kernel init
+- init - prvni proces systemd, zacne konfigurovat system, zapinat potrebne procesy
+- runlevely 0-6
+
+rc - run commands
+----------
+- `/etc/rc.d/` obsahuje jednotlive runlevely
+
+services
+------
+- `systemctl` ridi systemd system a managuje servicy
+- `systemctl list-units` seznam
+- `systemctl statsu httpd` status http deamon servicy
+- service muze mit vice procesu
+- systemctl reload, restart a dalsi options
+- starsi verze systemctl je service
+
+httpd
+----------
+- apache server
+- `/var/www/html/` zde jsou zdrojaky pro httpd
+- `/etc/httpd/conf/httpd.conf` konfigurace httpd service
+- `systemctl start httpd` zapnuti service
+- `systemctl status httpd` kontrola statusu
+- `curl localhost` zobrazi obsah souboru definovaeneho v httpd.conf
+
+filesystems
+-----------
+- `fdisk`
+
+LVM
+----
+- Logical Volume Manegement
+- fyzicke disky spojim do jednoho poolu, ktery pak delim na logicke disky nezavisle na fyzickych discich
+
+logy
+-----
+- `/var/log/messages` systemove logy, zaznamy o podstatnem deni v systemu
+- `/var/log/secure` logy o security
