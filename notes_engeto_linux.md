@@ -559,6 +559,8 @@ mountovani
 - `mount /dev/sd* /home/USER/DIR` mountovani zarizeni na konkretni misto - mount point
 - `mount -t ntfs /dev/sd* /home/USER/DIR` specifikace souboroveho systemu
 - `umount /home/USER/DIR` odmountovani
+- pri `umount` nesmim byt v danem mount pointu nebo bezet jine procery vyuzivajici zarizeni
+- `lsof /dev/sd**` vypise aktualni procesy
 
 dd
 -----
@@ -567,14 +569,17 @@ dd
 
 inode
 -----
-- unikatni cislo, muzeme pomoci nej smazat i poskozeny file
+- inode obsahuje metadate o filesystemu - velikost, UID, GID, typ, velikost, pocet bloku, odkaz na blok na disku (vice bloku), prava, ACL atd., NEobsahuje nazev souboru a data
+- je oznaceny jednoznacnym cislem, muzeme pomoci nej smazat i poskozeny file
 - `ls -li` vypise inody v prvni lekci
 - `df -i` pocet inodu v souborovych systemech
+- inode tabulka - databaze inodu, zaklad filesystemu, definuje pocet inodu (pevny/dynamicky)
+- pri vytvoreni souboru/slozky je alokovan jeden inode
 
 link
 -----
-- hardlink - odkaz na konkretni inode, nemuze byt mezi filesystemy kvuli unikatnosti inodu, hardlinky se tvari jako file
-- symlink - odkazuje na adresu (cestu?), netvari se jako file, ale jako `l`, muzeme linkovat i na jiny filesystem
+- hardlink - `ln <SOUBOR> <HLINK>`, odkaz na konkretni inode, na exisujici soubor, nemuze byt mezi filesystemy kvuli unikatnosti inodu, hardlinky se tvari jako originalni file; pridanim hardlinku pribyde jedna reference (`ls -l` druhy sloupec), pri smazani puvodniho souboru ubyde reference a soubor je zachovan (maze se az kdyz pocet odkazu=0); nevytvari se novy inode; opravneni, vlastnici atd zustavaji puvodni; hardlink neumi odkazovat na adresare; hledani `find . -samefile sample`
+- symlink - `ln -s <SOUBOR> <SLINK>, odkazuje na adresu (aboslutni/relativni cestu), je to tedy retezec znaku; netvari se jako file, ale jako `l`; muzeme linkovat i na jiny filesystem; pokud je cilovy sobor smazan, symlink prestane fungovat (broken link); umi odkazovat i na adresare; pro symlink se vytvori novy inode; hledani `find . -type l -name "sample*"`
 
 
 Linux 7
