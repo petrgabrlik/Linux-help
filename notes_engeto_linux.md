@@ -636,3 +636,90 @@ logy
 -----
 - `/var/log/messages` systemove logy, zaznamy o podstatnem deni v systemu
 - `/var/log/secure` logy o security
+
+
+webinar 19.3.
+==========
+
+- `if [ -e /etc/passw ]; then echo Yes;else echo No;fi`
+
+alias
+-----
+- `alias hello='echo Hello World'`
+- `alias hello2='echo -e "\n\t"'`, pak `hello2 Hello` udela to same jako `echo -e "\n\t" Hello`
+- `unalias`
+- list alias?
+- alias funguje jen instanci daneho shellu, pri zavreni zanikne
+
+expansions
+------
+- `echo {1,2,3} list
+- `echo {0..5}` vypise posloupnost, `{0..10..2}` definovani kroku 2
+- `echo {a..z}`, vypise abecedu, pracuje s tabulkou znaku tak jak jsou za sebou ulozene
+- `echo -e "\n\t" Hello`
+- `echo file_{a..c}{1..3}.txt` hodi se na generovani nazvu souboru
+- `echo {a..c}{1..3}` udela kombinace, `echo {a..c} {1..3}` udela dve nezavisle posloupnosti
+- `echo ~` `echo ~student` vypise home adresare uzivatele, hodi se do skriptovani
+- `echo a*` vypise vsechny soubory zacinajici a v danem adresari
+- 'echo $VARa' vyhodnoti neexistujici promenno VAR, `echo ${VAR}a` vypise promennou a prida k ni `a`, nejprve se udela expansion a pak substitution ??
+
+substitutions
+-----------
+- `$` znamena substituce/nahrada
+- `ls -l $(echo * | cut -f1-3 -d" ")` ls vypise soubory ktere dostane zpet od prikazu v subshellu
+- matematika `echo $((1+1))`
+- promenna `a=12`, pak `echo $a` vypise hodnotu
+
+uvozovky
+------
+- dvojite uvozovky `""` vypise substituci a potlaci expanzi; vytvori jeden argument, napr kdyz chci predat argument s mezerou, musim zabalit do dvojitych uvozovek; pouzivaji se pro text a substituci najedno
+- `echo "pocet souboru $(ls -l | wc -l)"`
+- `echo a"*"` potlaceni funkce hvezdicky, bere to jako retezec
+- jednoduche uvozovky `''` potlaci vsechny prikazy, expanzi i substituci, vse bere jako text
+- backlash `\` potlaci funkci escape znaku, tedy `echo "\$(ls)"` vypise $(ls), pez lomitka vypise obsah adresare
+
+promenne
+-----------
+- promena se definuje pomoci rovnitka, nesmi obsahovat mezeru, napr `a=1`
+- `for i in {1..5};do echo $((i+1));done`
+
+eval
+-------
+- pokusi se spustit retezec az jsou vsechny bashove prikazy vyhodnocene ??
+- `eval "echo {1..$VAR}"` prvni dosadi promennou, potom az udela expansion
+
+xargs
+-----
+- rozlozi do rady ??
+
+webinar 24.3.
+============
+
+promenne a environment
+------------
+- set, env, export, unset
+- nova promenna se ulozi v lokalnim shellu, viz `set`, nededi se do subshellu
+- `export` na ulozeni promenne do env, globalni promenna ktera se dedi do subshellu
+- .bash_profile se vola pred .bashrc, existuje i global /etc/bashrc, 
+- .bash_logout se provede pri odpojovani od shellu, treba pri ukoncovani ssh
+- `source` nacteni souboru, nacteni promennych atd a ulozeni do aktualniho environmentu
+
+bc
+----
+- kalkulacka, program, umi desetinne cisla a dalsi veci co neumi matematika v substitution `$(())`, umi i logicke vyrazy
+
+skriptovani
+------------
+- v elerningu kurz skriptovani
+- buldin promenne drzi informace o skriptu a jeho argumentech, jsou to promenne 0-9, 0 je path skriptui ze ktere byl volan, zbytek argumenty skriptu
+- specialni promenne, $# pocet argumentu, $$ pid shellu, $@ vsechny argumenty seznam, to same $* ale nejaky rozdil tam je, $? exit status posledniho prikazu
+- promenne nesmi zacinat cislem, jsou to rezervovane promenne pro argumenty skriptu, shell se takovou promennou snazi spustit jako command
+- systemove promenne - napr $PATH $USER $RANDOM $SECONDS (sekundy od zacatku skriptu), $LINENUM?
+- shell vsechno co neexistuje bere jako prazdnou promennou a vypise prazdny radek v pripade echo, nevyhodi chybu
+- exit status - 0 uspech, zbytek nejake chyby, grep vyjimka vraci 1 kdyz nenajde zadny radek, coz neni vlastne chyba
+- `exit` na konci skriptu ukonci s hodnotou 0, pripadne s predanou hodnotou
+- binarky `true` a `false` vraci exit hodnoty 0 resp 1
+- shell umi pracovat jenom s jednim typem dat a je to text, az pri samotnem pouziti se vyhodnocuje jestli to neni cislo
+- funkce je blok kodu, `function sayHello() {echo hello}`, volat se musi az po definici, klicove slovo `function` neni nutne, funkce pouzivaji vlastni argumenty $1 $2 atd, nejsou to ty same jako argumenty skriptu
+- funkci muzu napsat i v shellu, ulozi se do aktualniho environmentu (bude videt v `set`)
+- `exit` ukonci shell a nastavi exit status, `return` ukonci funkci a nastavi exit status
