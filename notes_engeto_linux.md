@@ -355,7 +355,7 @@ permission
 - u adresare x znamena moznot vlezt do adresare (stat se validni adresou)
 - `chmod` zmena prav, dva typy zapisu, symbolicky a numericky
 - symbolicy: napr. u+x (ugoa)(+-=)(rwx), = znamena presne tyto parametry
-- numericka: r-4 w-3 x-1, napr. `chmod 755 FILE`, pri 000 muze jenom root
+- numericka: r-4 w-2 x-1, napr. `chmod 755 FILE`, pri 000 muze jenom root
 - specielni permissions, `chmod +s`
 - sticky bit - aby mohl mit nejakou funkci, musi byt soubor executable, pokud je `S` tak neplatne, musi byt `s`
 - SUID - `s`, proces pobezi pod tim userem, kdo je owner, priklad `/bin/chmod` je pokazde spusten pod rootem, stejne tak pri zmene hesla pomoci `/usr/bin/passwd` je diky suid vzdycky provedeno jako root a muze tak modifikovat soubor s hesly `/etc/shadow` vlastneny rootem
@@ -712,7 +712,7 @@ skriptovani
 ------------
 - v elerningu kurz skriptovani
 - buldin promenne drzi informace o skriptu a jeho argumentech, jsou to promenne 0-9, 0 je path skriptui ze ktere byl volan, zbytek argumenty skriptu
-- specialni promenne, $# pocet argumentu, $$ pid shellu, $@ vsechny argumenty seznam, to same $* ale nejaky rozdil tam je, $? exit status posledniho prikazu
+- specialni promenne, $# pocet argumentu, $$ pid shellu, $@ vsechny argumenty seznam, to same $* ale nejaky rozdil tam je, $? exit status posledniho prikazu, $0 aktualne pouzivany shell (bash, zsh..), ve skriptu vypise cestu jakou byl spusten
 - promenne nesmi zacinat cislem, jsou to rezervovane promenne pro argumenty skriptu, shell se takovou promennou snazi spustit jako command
 - systemove promenne - napr $PATH $USER $RANDOM $SECONDS (sekundy od zacatku skriptu), $LINENUM?
 - shell vsechno co neexistuje bere jako prazdnou promennou a vypise prazdny radek v pripade echo, nevyhodi chybu
@@ -723,3 +723,85 @@ skriptovani
 - funkce je blok kodu, `function sayHello() {echo hello}`, volat se musi az po definici, klicove slovo `function` neni nutne, funkce pouzivaji vlastni argumenty $1 $2 atd, nejsou to ty same jako argumenty skriptu
 - funkci muzu napsat i v shellu, ulozi se do aktualniho environmentu (bude videt v `set`)
 - `exit` ukonci shell a nastavi exit status, `return` ukonci funkci a nastavi exit status
+
+| Vestavene promenna | Hodnota |
+| ------------------ | ------- |
+| `$1` - `$9`        | prvnich 9 argumentu skriptu |
+| `$0`               | cesta kterou byl skript zavolan, v shellu vrati pouzity typ shellu |
+| `$#`               | pocet argumentu skriptu |
+| `$@`               | seznam vsech argumentu |
+| `$$`               | PID shellu |
+| `$?`               | exit status posledniho prikazu |
+
+webinar 26.3.
+===============
+- testy, podminky a cykly
+
+testy
+--------
+- `test` binarka testuje podminku a vraci 0/1, napr `test 1 -eq 2'
+- to same pomoci hranatych zavorek `[ 1 -eq 2 ]'
+- to same pomoci dvou hranatych zavorek `[[ 1 -eq 2 ]]', PREFEROVANA VARIANTA
+- vsechno jsou to binarky, viz `which [` apod
+- vysledek testu je mozne vycist pres exit hodnotu `$?`
+- pro cisla: `-eq -nq -le -ge -lt -gt` 
+- pro string: `== != -z -n`, napr `[[ -z $VAR ]]` 
+- stringy je dobre davat do dvojitych uvozovek pro prevod na retezec, protoze muze mit vice casti a specialni znaky
+- pro soubory: existence `-e -f -d`, prava `-r -x -w`, velikost true vetsi nez 0 `-s`
+- logicke navaznosti - retezeni vyrazu na zaklade logickych operatoru, AND `&&` a OR `||`
+- `yum install cowsay && cowsay hello` nasledujici operace se provede pouze pokud bude exit status 0 u predchozi, u OR se provede pri exit 1 ?
+- `[[ -d DIR ]] || mkdir DIR && cd DIR`
+
+(jednoduchy odpocet)
+----------------
+- `for i in {60..1};do echo $i;sleep 1;done && echo FINISH`
+- `for i in {5..1};do echo $i;sleep 1;done && while true;do printf "COFFEE ";sleep 0.01;done` coffee stopky
+
+podminky
+----------
+- `if [[ $1 -ef 1 ]];then echo "arg is 1";else echo "arg not 1";fi 
+- if se rozhoduje podle exit status testu, pokud je test syntax chybny, stejne se vetveni provede podle exitu, proti jinym jakzykum je benevolentni
+- `if TEST;then NECO;elif TEST;then NECO;else NECO;fi
+- (na zacatku skriptu je dobre testovat jestli je uzivatel root, pokud je pro bez skriptu potreba root,, a co sudo?)
+- `case $i in;1) echo "1";;*) echo "2";;esac`
+
+cykly
+-------
+- for je iterator, iterovat muzu list cisel, radky vypisu atd
+- `for i in 1 2 3 4;do ...;done`
+- `for i in $(ls);do cp $i $i.bck;done` ???? zalohovani otestovat
+- `while [[ TEST]];do NECO;done`
+- `until [[ TEST ]];do NECO;done
+
+skriptovani poznamky
+--------
+- `./script.sh` spusti se v subshellu
+- `. ./script.sh` spusti se v aktualnim shellu
+- `shift` posouva argumenty skriptu/funkce smerem k prvnimu, `echo $1;shift;echo $1` vypise prvni a nasledne druhy argument
+
+webinar 31.3.
+=======
+- `read` vstup u
+- `cat < /dev/tcp/192.168.0.103/22` zpusob jak se pripojit na host/port, nejedna s o cestu, ale o built-in prikaz
+- `true > /dev/tcp/192.168.0.103/22` testovani portu
+- pokud ve skriptu nechci vypisovat chyby tak `>2 /dev/null`
+
+webinar 2.4.
+========
+- regularni vyrazy
+- `ls | grep -E '(\.sh|\.py)$'` soubory s danou koncovkou
+- `grep ^# hosts` a `grep ^[^#] hosts` radky s komentarem/bez komentare
+- `grep -E` je pokrocily regularni vyraz, regex musi byt v uvozovkach
+- hodne se pouzivaji s `grep` a `sed`
+- `grep -E "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9] [0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])" hostfile_smp` konrola ip adresy
+- `sed` nahrada znaku ??
+
+read
+------
+- cteni uzivatelskeho vstupu z konzole po stisknuti entru
+- pokud neni predana promenna na ulozeni, ulozi se do `REPLY`
+- `read VAR` ulozeni do promenne
+- `read VAR1 VAR2 VAR3` nacte tri promenne oddelene (defaultne) mezerou, do posledni se uklozi zbytek
+- `read -p "Zaadej jmeno a prijmeni: " NAME SURNAME` zobrazeni promptu
+- `read -n1 VAR` nacti pouze jeden znak a ukonci (pripadne jiny pocet), `read -n1 -p "Continue (y/n): " VAR`
+
