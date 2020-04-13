@@ -805,3 +805,11 @@ read
 - `read -p "Zaadej jmeno a prijmeni: " NAME SURNAME` zobrazeni promptu
 - `read -n1 VAR` nacti pouze jeden znak a ukonci (pripadne jiny pocet), `read -n1 -p "Continue (y/n): " VAR`
 
+webinar 7.4. - databaze
+=======
+- `sqlite3 tamago.db 'CREATE TABLE creatures (id INTEGER PRIMARY KEY, name TEXT NOT NULL, food INTEGER NOT NULL, health INTEGET NOT NULL, is_dead INTEGER NOT NULL DEFAULT 0 );'` 
+- query nejsou case sensitive, ale pro lepsi citelnost VELKYMI
+- `sqlite` mozno zapnout v interaktivnim rezimu, nebo jako command v argumentem
+
+- `nohup script.sh &` spusti na pozadi 
+- `tail -f nohup.out` vypise co vypisuje skript na pozadi
