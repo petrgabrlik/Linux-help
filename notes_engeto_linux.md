@@ -714,9 +714,7 @@ skriptovani
 - buldin promenne drzi informace o skriptu a jeho argumentech, jsou to promenne 0-9, 0 je path skriptui ze ktere byl volan, zbytek argumenty skriptu
 - specialni promenne, $# pocet argumentu, $$ pid shellu, $@ vsechny argumenty seznam, to same $* ale nejaky rozdil tam je, $? exit status posledniho prikazu, $0 aktualne pouzivany shell (bash, zsh..), ve skriptu vypise cestu jakou byl spusten
 - promenne nesmi zacinat cislem, jsou to rezervovane promenne pro argumenty skriptu, shell se takovou promennou snazi spustit jako command
-- systemove promenne - napr $PATH $USER $RANDOM $SECONDS (sekundy od zacatku skriptu), $LINENUM?
-- shell vsechno co neexistuje bere jako prazdnou promennou a vypise prazdny radek v pripade echo, nevyhodi chybu
-- exit status - 0 uspech, zbytek nejake chyby, grep vyjimka vraci 1 kdyz nenajde zadny radek, coz neni vlastne chyba
+- systemove promenne - napr $PATH $USER $RANDOM $SECONDS (sekundy od zacatku skriptu), $LINENUM?  - shell vsechno co neexistuje bere jako prazdnou promennou a vypise prazdny radek v pripade echo, nevyhodi chybu - exit status - 0 uspech, zbytek nejake chyby, grep vyjimka vraci 1 kdyz nenajde zadny radek, coz neni vlastne chyba
 - `exit` na konci skriptu ukonci s hodnotou 0, pripadne s predanou hodnotou
 - binarky `true` a `false` vraci exit hodnoty 0 resp 1
 - shell umi pracovat jenom s jednim typem dat a je to text, az pri samotnem pouziti se vyhodnocuje jestli to neni cislo
@@ -746,23 +744,38 @@ testy
 - vysledek testu je mozne vycist pres exit hodnotu `$?`
 - testy pro cisla: `-eq -nq -le -ge -lt -gt` 
 - testy pro string: `== != -z -n`, napr `[[ -z $VAR ]]` 
-- stringy je dobre davat do dvojitych uvozovek pro prevod na retezec, protoze muze mit vice casti a specialni znaky
+- stringy je dobre davat do dvojitych uvozovek pro prevod na retezec, protoze muze mit vice casti a specialni znaky, taky kvuli prehlednosti
 - pro soubory: existence `-e -f -d`, prava `-r -x -w`, velikost true vetsi nez 0 `-s`
-- logicke navaznosti - retezeni vyrazu na zaklade logickych operatoru, AND `&&` a OR `||`
-- `yum install cowsay && cowsay hello` nasledujici operace se provede pouze pokud bude exit status 0 u predchozi, u OR se provede pri exit 1 ?
-- `[[ -d DIR ]] || mkdir DIR && cd DIR`
+- `!` pro negaci vyrazu, `[[ ! -f test.txt ]]` nebo `! [[ -f test.txt ]]`
+- mezi jednotlivymi prvnky v testu musi byt mezery
 
 | Operator    | Popis |
 | ----------- | ----- |
 | Aritmeticke |
-| ----------- | ----- |
 | `-eq`       | equal |
-| `-nq`       | not equal |
+| `-nq`       | not-equal |
 | `-gt`       | greater then |
 | `-lt`       | less then |
 | `-ge`       | greatr or equal |
 | `-le`       | less or equal |
 | Retezce     |
+| `-z`        | empty |
+| `-n`        | existing (non-empty) string |
+| `==`        | equal |
+| `!=`        | not-equal |
+| Soubory     |
+| `-e`        | exist |
+| `-f`        | exist, file - bezny soubor |
+| `-d`        | exist, directory |
+| `-r`        | exist, readable pro akt. usera |
+| `-w`        | exist, writable pro akt. usera |
+| `-x`        | exist, executable pro akt. usera |
+
+retezeni prikazu
+-------
+- logicke navaznosti - retezeni vyrazu na zaklade logickych operatoru, AND `&&` a OR `||`
+- `yum install cowsay && cowsay hello` nasledujici operace se provede pouze pokud bude exit status 0 u predchozi, u OR se provede pri exit 1 ?
+- `[[ -d DIR ]] || mkdir DIR && cd DIR`
 
 (jednoduchy odpocet)
 ----------------
@@ -774,19 +787,23 @@ podminky
 - `if [[ $1 -ef 1 ]];then echo "arg is 1";else echo "arg not 1";fi 
 - if se rozhoduje podle exit status testu, pokud je test syntax chybny, stejne se vetveni provede podle exitu, proti jinym jakzykum je benevolentni
 - `if TEST;then NECO;elif TEST;then NECO;else NECO;fi
-- (na zacatku skriptu je dobre testovat jestli je uzivatel root, pokud je pro bez skriptu potreba root,, a co sudo?)
-- `case $i in;1) echo "1";;*) echo "2";;esac`
+- (na zacatku skriptu je dobre testovat jestli je uzivatel root, pokud je pro bez skriptu potreba root)
+- `case $i in; 1); echo "1";; 2); echo "2";; *); echo "jine";;esac` jako inline nejak nefunguje
 
 cykly
 -------
+- v bashi tri druhy: while, until, for
 - for je iterator, iterovat muzu list cisel, radky vypisu atd
 - `for i in 1 2 3 4;do ...;done`
 - `for i in $(ls);do cp $i $i.bck;done` ???? zalohovani otestovat
+- `for (( var=0; var<=10; var+=2 ));do echo $var;done` C-ckova syntaxe
 - `while [[ TEST]];do NECO;done`
-- `until [[ TEST ]];do NECO;done
+- `until [[ TEST ]];do NECO;done` probiha dokud nezacne byt podminka pravdiva, pokud je platna od pocatku telo se neprovede ani jednou
+- `break` okamzite ukonci cyklus, z ktereho je zavolan, program pokracuje za klicovym slovem `done`
+- `continue` prerusi bezici iteraci cyklu z ktereho je zavolan a zacne novy cyklus
+- `break 3` `continue 2` moznost specifikovat kolik vnorenych cyklu se ma prerusit/pokracovat ?
 
-skriptovani poznamky
---------
+skriptovani poznamky --------
 - `./script.sh` spusti se v subshellu
 - `. ./script.sh` spusti se v aktualnim shellu
 - `shift` posouva argumenty skriptu/funkce smerem k prvnimu, `echo $1;shift;echo $1` vypise prvni a nasledne druhy argument
