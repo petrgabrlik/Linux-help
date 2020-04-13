@@ -742,15 +742,27 @@ testy
 - `test` binarka testuje podminku a vraci 0/1, napr `test 1 -eq 2'
 - to same pomoci hranatych zavorek `[ 1 -eq 2 ]'
 - to same pomoci dvou hranatych zavorek `[[ 1 -eq 2 ]]', PREFEROVANA VARIANTA
-- vsechno jsou to binarky, viz `which [` apod
+- `test` i `[` by mely fungovat  vzdy, byvaji jako binarky v systemu (`which`) i soucasti shellu (`type`), `[[` je novejsi a podporuji vetsi sadu vyrazu
 - vysledek testu je mozne vycist pres exit hodnotu `$?`
-- pro cisla: `-eq -nq -le -ge -lt -gt` 
-- pro string: `== != -z -n`, napr `[[ -z $VAR ]]` 
+- testy pro cisla: `-eq -nq -le -ge -lt -gt` 
+- testy pro string: `== != -z -n`, napr `[[ -z $VAR ]]` 
 - stringy je dobre davat do dvojitych uvozovek pro prevod na retezec, protoze muze mit vice casti a specialni znaky
 - pro soubory: existence `-e -f -d`, prava `-r -x -w`, velikost true vetsi nez 0 `-s`
 - logicke navaznosti - retezeni vyrazu na zaklade logickych operatoru, AND `&&` a OR `||`
 - `yum install cowsay && cowsay hello` nasledujici operace se provede pouze pokud bude exit status 0 u predchozi, u OR se provede pri exit 1 ?
 - `[[ -d DIR ]] || mkdir DIR && cd DIR`
+
+| Operator    | Popis |
+| ----------- | ----- |
+| Aritmeticke |
+| ----------- | ----- |
+| `-eq`       | equal |
+| `-nq`       | not equal |
+| `-gt`       | greater then |
+| `-lt`       | less then |
+| `-ge`       | greatr or equal |
+| `-le`       | less or equal |
+| Retezce     |
 
 (jednoduchy odpocet)
 ----------------
