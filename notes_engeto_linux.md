@@ -842,3 +842,26 @@ webinar 7.4. - databaze
 
 - `nohup script.sh &` spusti na pozadi 
 - `tail -f nohup.out` vypise co vypisuje skript na pozadi
+
+
+webinar 14.4.
+========
+
+beh na pozadi
+-----
+- `&` na konci radku prikazu spusti prikaz na pozadi
+- `nohup`
+- `disown`
+
+ruzne
+-----
+- `cp /tmp/file.txt{,.bck}` shell udela prvni expanzi, taktze vytvori dva argumenty pro cp,, vytvori zalohu file
+- `stty -echo` a `stty echo` vypne/zapne zobrazeni psanych znaku, vstup ale existuje na pozadi a prikaz se provede
+
+inicializace linuxu po instalaci
+------
+- pouzivat dotfiles, vhodne jen na konfiguraci konfigurovatelnych veci (programu), nejde pouzit napr pro vytvareni uzivatelu
+- binarni kopie nakonfigurovatelneho systemu, jde pouzit jen ja stejne hw
+- Docker images
+- automaticky deploy pomoci specialnich nastroju (Ansible, spise na vetsi deploymenty, servery)
+- instalacni skript, posloupnost commandu jako se psaly do shellu
