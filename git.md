@@ -80,7 +80,7 @@ git commit -m 'commit message'
 
 ## Remote repos
 
-Show current remote servers
+Show current remote servers (short names)
 ```
 git remote
 ```
@@ -93,7 +93,12 @@ git remote -v
 Add new remote server
 ```
 git remote add <shortname> <url>
-git remote add pb https://github.com/username/repo
+git remote add origin https://github.com/username/repo
+```
+
+Push the current branch and set the remote as upstream
+```
+git push -u origin master
 ```
 
 Change remote URL
