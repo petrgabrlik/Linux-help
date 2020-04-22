@@ -865,3 +865,23 @@ inicializace linuxu po instalaci
 - Docker images
 - automaticky deploy pomoci specialnich nastroju (Ansible, spise na vetsi deploymenty, servery)
 - instalacni skript, posloupnost commandu jako se psaly do shellu
+
+
+webinar 16.4.
+=====
+
+prompty
+-----
+- `$PS1` struktura standardniho promptu, muzu zmenit napr `PS1="[\u@\h]" 
+- `$PS2` ?
+- `$PS3` ?
+
+porty
+-----
+- `netstat -tulpn` prehled otevrenych portu
+- upnp protokol pro pristup z vnejsi site do vnitrni, jinak pomoci port forwardingu
+
+
+RUZNE PROBLEMY
+------------
+- odstraneni pocatecnich nul ze stringu (cisla): `echo 007 | awk '{printf "%d\n",$0}'` nebo `echo 007 | sed 's/^0*//'` (smaze vsechny nuly i v pripade 000)
