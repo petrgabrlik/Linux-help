@@ -865,3 +865,30 @@ inicializace linuxu po instalaci
 - Docker images
 - automaticky deploy pomoci specialnich nastroju (Ansible, spise na vetsi deploymenty, servery)
 - instalacni skript, posloupnost commandu jako se psaly do shellu
+
+
+online kurz Linux 3
+============
+
+wildcards
+-------
+- `.` odkaz na aktualni adresar
+- `..` odkaz na nadrazeny adresar
+- `*` zastupny znak pro libovolnou kombinaci znaku, napr v adrese `ls /home/us*/*`
+- `?` zastupny znak pro jeden libovolny znak, mozno pouzit vice za sebou `ls -l file??`
+- `~` zastupny znak pro domovsky adresar, primarne aktualniho uzivatele `cd ~/dir/`, nebo jineho uzivatele `cd ~user/dir/`
+- `{}` slozene zavorky vytvari posloupnost znaku, `echo A{1,X,zzz}` vypise `A1` `Ax` a `Azzz`, rozsahy `{0..9}`, `{a..z}` atd, `echo {1..4}{a..d}` uela kombinace, `echo {1..4} {a..d}` udela dve posloupnosti za sebou
+
+command substituce
+---------
+- `$(command)`
+- provede prikaz v subshellu a nahradi se vystupem, ktery bychom dostali na standardni vystup; tedy na miste celeho prikaze se objevi jeko vystup
+- kdyz `pwd` vypise `/home/user`, tak `echo dir: $(pwd)` vypise `dir: /home/user`
+- vypse pocet obycejnych souboru v adresari: `echo "Počet souborů: $(ls -l | grep ^- | wc -l)"`
+- starsi zapis je pomoci zpetnych uvozovek
+
+aritmeticka expanze
+-----
+- `$(( vyraz ))`
+- vypocty pomoci zakladnich matematickych operaci `+ - * / % **` 
+- mezery jsou ignorovany, mozno pouzit vnorene zavorky
