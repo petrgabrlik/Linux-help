@@ -882,7 +882,7 @@ porty
 - upnp protokol pro pristup z vnejsi site do vnitrni, jinak pomoci port forwardingu
 
 
-online kurz Linux 3
+Online kurz Linux 3.1
 ============
 
 wildcards
@@ -907,6 +907,104 @@ aritmeticka expanze
 - `$(( vyraz ))`
 - vypocty pomoci zakladnich matematickych operaci `+ - * / % **` 
 - mezery jsou ignorovany, mozno pouzit vnorene zavorky
+
+promenne v shellu - set/env
+--------
+- `set` vypise seznam promennych, aliasu, funkci v aktualnim shellu; tyto promenne nejsou dedicne
+- `env` vypise seznam promennych ktere se dedi z shellu do subshellu
+- promenne nikdy nesmi zacinat cislem, kolem `=` nesmi byt mezery, tedy `A=4`
+- promenna jde vytvorit taky poomci `set A=4` a smazat pomoci `unset A`
+- `export` pro presunuti promenne do dedicneho prostredi `env`, napr `A=4; export A` nebo rovnou `export A=4`
+- zrusit export nejde, jedine `unset A` ktery ji smaze z `set` i `env`
+- jednorazova definice promenne pro jeden prikaz - predrazeni pred prikaz: `LANG=cs_CZ.UTF-8 date +%A`
+
+uvozovky a escape
+-------
+- dvojite `""` umozuji zachovat substituci s `$` (command substituce, aritmeticka expanze, promenne..), neumoznuje expanzi pomoci wildards, napr `echo "file*"`
+- jednoduche `''` vsechny znaky jsou vypsany tak jak jsou, zadna substituce
+- jednoduche uvozovky muzeme nahradit escape znakem `\`, napr. `echo \$USER` neprovede substituci, funkce dolaru byla potlacena
+
+aliasy
+------
+- zastupce prikazu pro zjednoduseni prace v shellu
+- `alias` vypise vsechny aliasy daneho shellu
+- syntaxe: `alias <nazev>=<prikaz>`
+- je mozne prepsat platny prikaz, pomoci `type <command>` lze overit existence prikazu
+- `unalias` pro zruseni aliasu
+
+
+Online kurz Linux 3.2
+============
+
+boot
+-----
+- init - prvni proces systemu (PID=1), daemon bezici celou dobu, zodpovida za spusteni ostatnich procesu; init ma vice implementaci: systemV, systemd, upstart
+
+systemV
+-------
+- rozdelen na runlevely systemu, rezim do ktereho system nabootoval, v kazdem mozny pristup k jinym procesum
+- `runlevel` vypise predchozi a aktualni runlevel
+- `init 3` prepnuti do runlevelu
+
+| runlevel | popis |
+| -------- | ----- |
+| 0        | system halt - zadna aktivita, system lze vypnout |
+| 1        | singel user |
+| 2        | multiple users, bez site | 
+| 3        | multiple users, CLI | 
+| 4        | nevyuzito | 
+| 5        | multiple users, GUI | 
+| 6        | reboot, restart systemu | 
+
+systemd 
+----- 
+- nova implementace 'init'
+- zakladmi prvkem jsou 'units', jsou to konfiguracni soubory sluzeb, zarizeni a komponent systemu 
+- units mohou byt vicero typu: service, mount, target.., dany soubor unitu se jmenuje napr `sluzba.service`, `poweroff.target` atd.
+- units je textovy soubor, obsahuje danou hiearchii: [Unit] - zavislosti, [Service/Mount/Target] - zapnuti sluzby/mountnuti filesystemu atd., [Install] - kdy se ma spustit? 
+- `Targets` nahrazuji runlevely, jsou reprezentovany vicero target unit soubory, slucuji pod sebe dalsi unit soubory (sluzby a daemony); popisuji zavislosti a zajistuji aby na kazdem levelu bezelo vse co ma (napr pred spustenim GUI se musi splnit rada jinych targetu, napr multiuser mod)
+- Targets odpovidaji nekterym runlevelum ze systemV, ale je jich vice
+
+| target             | popis |
+| ------------------ | ----- |
+| poweroff.target    | vypnout system |
+| rescue.target      | single user mod |
+| multi-user.target  | multi user se sitemi |
+| graphical.target   | multi user se sitemi a GUI |
+| reboot.target      | restart systemu |
+
+- `systemctl list-units --type target` vypise vsechny aktivni targets
+- zobrazit vychozi target `systemctl get-default`, nastavit `systemctl set-default`
+
+services
+-------
+- sluzba je aplikace/mnozina aplikaci bezici na pozaci, ceka na pouziti nebo neco vykonava, vetsinou je to daemon (background, non-interactive program)
+- sluzby jsou volany pomoci systemV/systemd
+- sluzby se ovladaji pomoci: `service <sluzba> <operace>` na systemu BEZ systemd; `systemctl <operace> <sluzba> na systemu SE systemd
+- operace: `status`, `start`, `stop`, `restart`, `reload`, `enable`, `disable`, `list-units --type=service`/`service --status-all` (bez systemd)
+
+at
+---
+- jednorazove spusteni ulohy
+- pro pouziti musi bezet sluzba-daemon `atd` na pozadi: `systemctl start atd`, pro kontrolu `systemctl status atd` (atd muze bezet uz po bootu automaticky)
+- pouziti: `at <time>` (pricemz time muze byt konkretni cas, nebo napr 'noon'), dale interaktivne napsat prikazy a zakoncit `<EOF>` nebo `Ctrl+D`
+- `at -l` vypise naplanovane udalosti
+- priklady casu: HH:MM, 5PM, noon, midnight, DD/MM/YY
+
+cron
+-----
+- je to daemon, umoznuje pravidelne vykonavat akci (zaloha dat, cisteni uzivatelu atd.)
+- prehledny - planovane akce se vypisuji do tabulky, kazdy uzivatel ma svou
+- format tabulky: `<min> <hour> <dayofmonth> <month> <dayofweek> <command>`, napr. `30 15 * * * cp /tmp/file /tmp/file.bkp` kazdy den v roce v 15:30
+- misto 5 sloupcu v tabulce mozne pouzit konstanty: @reboot, @yearly, @monthly, @weekly, @daily, @hourly
+- `crontab -e` editovani tabulky uzivatele, `crontab -l` vypise tabulku, `crontab -r` smaze celou tabulku, root muze pracovat s tabulkou vsech uzivatelu, napr `crontab -u <user> -l`
+- systemove procesy jsou konfigurovany v `/etc/crontab` nebo `/etc/cron.d/`
+
+vypnuti/restart
+----
+- systemy se 'systemV': `shutdown`, `shutdown +<m>` (za kolik minut, default `+1`), `shutdown now` (neboli `+0`), `shutdown <hh:mm>`, `shutdown -h` (halt, vypne jen procesy, zbytek pc bezi), `shutdown -r` (reboot), `reboot`
+- pred akci je mozne vsem uzivatelum poslat zpravu, musi byt specifikovan cas: `reboot 11:50 "Server maintanance, 1 hour max."` (cas je v UTC !)
+- systemy se 'systemd': `systemctl poweroff`, `systemctl halt`, `systemctl reboot`, nebo i vyse uvedene prikazy
 
 
 RUZNE PROBLEMY
