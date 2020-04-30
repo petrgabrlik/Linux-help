@@ -1006,6 +1006,15 @@ vypnuti/restart
 - pred akci je mozne vsem uzivatelum poslat zpravu, musi byt specifikovan cas: `reboot 11:50 "Server maintanance, 1 hour max."` (cas je v UTC !)
 - systemy se 'systemd': `systemctl poweroff`, `systemctl halt`, `systemctl reboot`, nebo i vyse uvedene prikazy
 
+Webinar 30.4. -  Databaze (Filip)
+--------
+- `apt-get install mariadb-server` instalace MariaDB
+- `mysql_secure_installation` pruvodce bezpecnostniho nastaveni databaze
+- `mysql` start interpreteru, mozno i pomoci `mariadb`
+- mariadb je fork z mysql pred tim nez to koupil Oracle a je licencne volnejsi
+- kvuli zpetne kompatibilite je mozne pouzivat commandy `mysql` misto `mariadb`
+- uzitecne odkazy na cviceni databazi: [https://www.codecademy.com/learn/learn-sql], [https://sqlzoo.net/], [https://www.w3schools.com/sql/]
+
 
 RUZNE PROBLEMY
 ------------
